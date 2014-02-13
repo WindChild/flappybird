@@ -1,6 +1,7 @@
 #include "HelloWorldScene.h"
 #include "SimpleAudioEngine.h"
 #include "GroundLayer.h"
+#include "GameLayer.h"
 
 using namespace cocos2d;
 using namespace CocosDenshion;
@@ -59,7 +60,25 @@ bool HelloWorld::init()
 
 
     pBird->runAction(CCRepeatForever::create(CCSpawn::create(animate,(CCActionInterval*)action,NULL)));
-    
+
+    CCMenu * pMenu = CCMenu::create();
+    pMenu->setPosition(ccp(0,0));
+    pMenu->setAnchorPoint(ccp(0,0));
+    addChild(pMenu);
+      
+    CCSprite * pNormal = CCSprite::createWithSpriteFrameName("start.png");
+    CCMenuItemSprite * pItem = CCMenuItemSprite::create(pNormal, NULL, NULL, this, menu_selector(HelloWorld::menuStartCallback));
+    pItem->setPosition(winSize.width/2, 350);
+    pMenu->addChild(pItem);
+
+    cache->removeSpriteFrames();
     return true;
+
+}
+
+void HelloWorld::menuStartCallback(CCObject* pSender)
+{
+   CCDirector::sharedDirector()->replaceScene(GameLayer::scene());
+   removeAllChildrenWithCleanup(true);
 }
 

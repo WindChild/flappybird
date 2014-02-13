@@ -1,16 +1,16 @@
-#include "HelloWorldScene.h"
+#include "GameLayer.h"
 #include "SimpleAudioEngine.h"
+#include "GroundLayer.h"
 
-using namespace cocos2d;
 using namespace CocosDenshion;
 
-CCScene* HelloWorld::scene()
+CCScene* GameLayer::scene()
 {
     // 'scene' is an autorelease object
     CCScene *scene = CCScene::create();
     
     // 'layer' is an autorelease object
-    HelloWorld *layer = HelloWorld::create();
+    GameLayer *layer = GameLayer::create();
 
     // add layer as a child to scene
     scene->addChild(layer);
@@ -20,65 +20,90 @@ CCScene* HelloWorld::scene()
 }
 
 // on "init" you need to initialize your instance
-bool HelloWorld::init()
+bool GameLayer::init()
 {
-    //////////////////////////////
-    // 1. super init first
-    if ( !CCLayer::init() )
-    {
-        return false;
-    }
-
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    CCMenuItemImage *pCloseItem = CCMenuItemImage::create(
-                                        "CloseNormal.png",
-                                        "CloseSelected.png",
-                                        this,
-                                        menu_selector(HelloWorld::menuCloseCallback) );
-    pCloseItem->setPosition( ccp(CCDirector::sharedDirector()->getWinSize().width - 20, 20) );
-
-    // create menu, it's an autorelease object
-    CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-    pMenu->setPosition( CCPointZero );
-    this->addChild(pMenu, 1);
-
-    /////////////////////////////
-    // 3. add your codes below...
-
-    // add a label shows "Hello World"
-    // create and initialize a label
-    CCLabelTTF* pLabel = CCLabelTTF::create("Hello World", "Thonburi", 34);
-
-    // ask director the window size
-    CCSize size = CCDirector::sharedDirector()->getWinSize();
-
-    // position the label on the center of the screen
-    pLabel->setPosition( ccp(size.width / 2, size.height - 20) );
-
-    // add the label as a child to this layer
-    this->addChild(pLabel, 1);
-
-    // add "HelloWorld" splash screen"
-    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    pSprite->setPosition( ccp(size.width/2, size.height/2) );
-
-    // add the sprite as a child to this layer
-    this->addChild(pSprite, 0);
+  if ( !CCLayer::init() )
+  {
+      return false;
+  }
+  m_bFirstTouch = true;
+  CCSize winSize = CCDirector::sharedDirector()->getWinSize();
+  
+  CCSprite *pBg = CCSprite::create("bg.png");
+  pBg->setPosition(ccp(winSize.width/2,winSize.height/2));
+  addChild(pBg);
+  
+  GroundLayer *pGroundLayer = GroundLayer::create();
+  addChild(pGroundLayer);
+  
+  CCSpriteFrameCache* cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+  
+  cache->addSpriteFramesWithFile("flappy_packer.plist", "flappy_packer.png");
+  
+  CCAnimation * animation = CCAnimation::create();
+  for(int i=1;i<=3;++i){
+    char fileName[50] = {0};
+    sprintf(fileName,"bird%d.png",i);
+    CCSpriteFrame* pFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(fileName);
+    animation->addSpriteFrame(pFrame);
+  }
+  animation->setDelayPerUnit(0.5f / 3.0f);
+  CCAnimate *animate = CCAnimate::create(animation);
+  
+  CCActionInterval *moveBy = CCMoveBy::create(0.8f,ccp(0,8));
+  CCAction *action = CCSequence::create(moveBy,moveBy->reverse(),NULL);
+  
+  CCSprite *pBird = CCSprite::createWithSpriteFrameName("bird1.png");
+  pBird->setPosition(ccp(winSize.width/2,winSize.height/2));
+  addChild(pBird);
+  
+  
+  pBird->runAction(CCRepeatForever::create(CCSpawn::create(animate,(CCActionInterval*)action,NULL)));
+  
+  CCMenu * pMenu = CCMenu::create();
+  pMenu->setPosition(ccp(0,0));
+  pMenu->setAnchorPoint(ccp(0,0));
+  addChild(pMenu);
     
-    return true;
+  CCSprite * pNormal = CCSprite::createWithSpriteFrameName("start.png");
+  CCMenuItemSprite * pItem = CCMenuItemSprite::create(pNormal, NULL, NULL, this, menu_selector(GameLayer::menuStartCallback));
+  pItem->setVisible(false);
+  pItem->setPosition(winSize.width/2, 350);
+  pMenu->addChild(pItem);
+
+  m_pHint = CCSprite::createWithSpriteFrameName("click.png");
+  m_pHint->setPosition(ccp(winSize.width/2,winSize.height/2));
+  addChild(m_pHint);
+
+  setTouchEnabled(true);
+  return true;
+
 }
 
-void HelloWorld::menuCloseCallback(CCObject* pSender)
+void GameLayer::menuStartCallback(CCObject* pSender)
 {
-    CCDirector::sharedDirector()->end();
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
 }
+
+void GameLayer::registerWithTouchDispatcher(void)
+{
+    CCDirector::sharedDirector()->getTouchDispatcher()->addTargetedDelegate(this, 100, true);
+}
+
+bool GameLayer::ccTouchBegan(CCTouch * pTouch,CCEvent * pEvent)
+{
+  if(m_bFirstTouch)
+    onGameStart();
+  else{
+    
+  }
+  return true;
+}
+
+void GameLayer::onGameStart()
+{
+  m_bFirstTouch = false;
+  m_pHint->setVisible(false);
+  
+}
+

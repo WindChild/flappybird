@@ -232,7 +232,7 @@ obj/local/armeabi/objs/game_shared/__/__/Classes/HelloWorldScene.o: \
  /home/tukai/workspace/Cocos2d-X/cocos2d-2.1rc0-x-2.1.3/flappyBird/proj.android/../../cocos2dx/support/data_support/uthash.h \
  /home/tukai/workspace/Cocos2d-X/cocos2d-2.1rc0-x-2.1.3/flappyBird/proj.android/../../CocosDenshion/android/../include/SimpleAudioEngine.h \
  /home/tukai/workspace/Cocos2d-X/cocos2d-2.1rc0-x-2.1.3/flappyBird/proj.android/../../CocosDenshion/android/../include/Export.h \
- jni/../../Classes/GroundLayer.h
+ jni/../../Classes/GroundLayer.h jni/../../Classes/GameLayer.h
 
 jni/../../Classes/HelloWorldScene.h:
 
@@ -699,3 +699,5 @@ jni/../../Classes/HelloWorldScene.h:
 /home/tukai/workspace/Cocos2d-X/cocos2d-2.1rc0-x-2.1.3/flappyBird/proj.android/../../CocosDenshion/android/../include/Export.h:
 
 jni/../../Classes/GroundLayer.h:
+
+jni/../../Classes/GameLayer.h:
