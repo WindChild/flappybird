@@ -2,6 +2,8 @@
 #define __GAME_LAYER_H__
 
 #include "cocos2d.h"
+#include "Bird.h"
+#include "PipesLayer.h"
 
 using namespace cocos2d;
 class GameLayer : public cocos2d::CCLayer
@@ -22,6 +24,8 @@ public:
 private:
   CCSprite *m_pHint;
   bool m_bFirstTouch;
+  Bird *m_pBird;
+  PipesLayer *m_pPipesLayer;
   
   void menuStartCallback(CCObject* pSender);
   void onGameStart();

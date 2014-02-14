@@ -28,37 +28,24 @@ bool GameLayer::init()
   }
   m_bFirstTouch = true;
   CCSize winSize = CCDirector::sharedDirector()->getWinSize();
-  
-  CCSprite *pBg = CCSprite::create("bg.png");
-  pBg->setPosition(ccp(winSize.width/2,winSize.height/2));
-  addChild(pBg);
-  
-  GroundLayer *pGroundLayer = GroundLayer::create();
-  addChild(pGroundLayer);
-  
+    
   CCSpriteFrameCache* cache = CCSpriteFrameCache::sharedSpriteFrameCache();
   
   cache->addSpriteFramesWithFile("flappy_packer.plist", "flappy_packer.png");
   
-  CCAnimation * animation = CCAnimation::create();
-  for(int i=1;i<=3;++i){
-    char fileName[50] = {0};
-    sprintf(fileName,"bird%d.png",i);
-    CCSpriteFrame* pFrame = CCSpriteFrameCache::sharedSpriteFrameCache()->spriteFrameByName(fileName);
-    animation->addSpriteFrame(pFrame);
-  }
-  animation->setDelayPerUnit(0.5f / 3.0f);
-  CCAnimate *animate = CCAnimate::create(animation);
   
-  CCActionInterval *moveBy = CCMoveBy::create(0.8f,ccp(0,8));
-  CCAction *action = CCSequence::create(moveBy,moveBy->reverse(),NULL);
+  CCSprite *pBg = CCSprite::create("bg.png");
+  pBg->setPosition(ccp(winSize.width/2,winSize.height/2));
+  addChild(pBg);
+
+  m_pPipesLayer = PipesLayer::create();
+  addChild(m_pPipesLayer);
   
-  CCSprite *pBird = CCSprite::createWithSpriteFrameName("bird1.png");
-  pBird->setPosition(ccp(winSize.width/2,winSize.height/2));
-  addChild(pBird);
-  
-  
-  pBird->runAction(CCRepeatForever::create(CCSpawn::create(animate,(CCActionInterval*)action,NULL)));
+  GroundLayer *pGroundLayer = GroundLayer::create();
+  addChild(pGroundLayer);
+
+  m_pBird = Bird::create();
+  addChild(m_pBird);
   
   CCMenu * pMenu = CCMenu::create();
   pMenu->setPosition(ccp(0,0));
@@ -94,9 +81,8 @@ bool GameLayer::ccTouchBegan(CCTouch * pTouch,CCEvent * pEvent)
 {
   if(m_bFirstTouch)
     onGameStart();
-  else{
-    
-  }
+
+  m_pBird->flyAnimation();
   return true;
 }
 
@@ -104,6 +90,6 @@ void GameLayer::onGameStart()
 {
   m_bFirstTouch = false;
   m_pHint->setVisible(false);
-  
+  m_pPipesLayer->onGameStart();
 }
 
